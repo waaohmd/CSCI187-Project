@@ -1,0 +1,74 @@
+{
+  "listings": [
+    {
+      "id": "lst_1001",
+      "owner": "Hue N.",
+      "name": "Compact mini fridge",
+      "description": "Clean 3.1 cu ft fridge with a small freezer compartment. Fits easily under a lofted dorm bed.",
+      "photos": ["assets/mini-fridge.svg"],
+      "price": 65,
+      "category": "Appliances",
+      "condition": "Good",
+      "location": "Maple Apartments",
+      "status": "available",
+      "created_at": "2026-10-19T16:20:00Z"
+    },
+    {
+      "id": "lst_1002",
+      "owner": "You",
+      "name": "Solid wood study desk",
+      "description": "Sturdy desk with a wide work surface. A few small marks from normal use; legs detach for moving.",
+      "photos": ["assets/desk.svg"],
+      "price": 48,
+      "category": "Furniture",
+      "condition": "Good",
+      "location": "West Hall",
+      "status": "available",
+      "created_at": "2026-10-19T15:10:00Z"
+    },
+    {
+      "id": "lst_1003",
+      "owner": "Amara L.",
+      "name": "Comfy reading chair",
+      "description": "Cozy accent chair for a bedroom or reading corner. No stains or tears.",
+      "photos": ["assets/chair.svg"],
+      "price": 35,
+      "category": "Furniture",
+      "condition": "Like new",
+      "location": "Oak Residence",
+      "status": "available",
+      "created_at": "2026-10-18T22:40:00Z"
+    }
+  ],
+  "help_posts": [
+    {
+      "id": "hlp_2001",
+      "owner": "You",
+      "title": "Help carry a desk upstairs",
+      "type": "Moving & lifting",
+      "from_location": "West Hall lobby",
+      "to_location": "West Hall, room 314",
+      "date": "2026-10-21",
+      "time": "17:30",
+      "offer": 24,
+      "details": "One flight of stairs. The desk is already disassembled; I mainly need a second person for the desktop.",
+      "status": "open",
+      "created_at": "2026-10-19T17:00:00Z"
+    },
+    {
+      "id": "hlp_2002",
+      "owner": "Jordan P.",
+      "title": "Mini fridge delivery across campus",
+      "type": "Delivery",
+      "from_location": "Maple Apartments",
+      "to_location": "Cedar Hall",
+      "date": "2026-10-22",
+      "time": "14:00",
+      "offer": 18,
+      "details": "Elevator at pickup and ground-floor drop-off. A car or hand cart would be helpful.",
+      "status": "open",
+      "created_at": "2026-10-19T18:10:00Z"
+    }
+  ]
+}
+
