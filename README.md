@@ -28,7 +28,6 @@ php -S localhost:8080 -t .
 
 Then open `http://localhost:8080`.
 
-The API stores records in `data/store.json`. Up to four photos (1 MB each) are stored as data URLs for this basic prototype; production should move uploads to object storage and add authentication, authorization, image validation, payments, and moderation.
 
 ## Files
 
