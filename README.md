@@ -2,6 +2,8 @@
 
 A JavaScript + PHP web application implementing the first posting workflow for the Campus Community Marketplace project.
 
+Read `PROJECT_BRIEF.md` and `STYLE_REQUIREMENTS.md` before changing the project.
+
 ## First prototype
 
 This prototype focuses on the initial marketplace and moving-help posting requirements. It provides working create, view, edit, sell, and remove flows backed by a PHP JSON API.

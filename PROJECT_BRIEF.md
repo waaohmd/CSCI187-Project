@@ -2,7 +2,7 @@
 
 **Status:** Canonical project reference for future requests  
 **Saved:** 2026-10-19  
-**Instruction:** Consult this brief before responding to or acting on every future request about this project. Do not implement features unless the user explicitly asks.
+**Instruction:** Consult this brief and `STYLE_REQUIREMENTS.md` before responding to or acting on every future request about this project. Do not implement features unless the user explicitly asks.
 
 ## Vision
 
