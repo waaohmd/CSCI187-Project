@@ -67,4 +67,5 @@ jobs:
           fi
 
           npm run test:api
+          node tests/help_validation.test.mjs
 
