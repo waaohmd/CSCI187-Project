@@ -112,5 +112,4 @@ assert.equal(
   'Test must leave the original number of help posts unchanged'
 );
 
-assert.fail('Intentional CI failure for assignment');
 console.log(`Help validation tests passed: ${invalidCases.length} invalid cases and 2 valid boundary cases.`);
