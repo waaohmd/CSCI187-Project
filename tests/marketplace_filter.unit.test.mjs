@@ -49,6 +49,5 @@ test('filtering does not reorder or modify the source array or its listings', ()
 });
 
 test('default options show every listing', () => {
-  // Intentional assignment failure: restore the correct expectation after CI turns red.
-  assert.deepEqual(filterListings(listings).map(item => item.id), []);
+  assert.deepEqual(filterListings(listings).map(item => item.id), ['desk', 'chair', 'lamp', 'fridge']);
 });
