@@ -3,7 +3,7 @@
 // Exercise the same pure function used by the page without HTTP, storage, or DOM mocks.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { filterListings } from '../assets/marketplace.mjs';
+import { filterListings } from '../assets/marketplace.js';
 
 // Distractors distinguish name, description, location, category, and condition matches.
 const listings = Object.freeze([

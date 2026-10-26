@@ -1,4 +1,4 @@
-import { filterListings } from './marketplace.mjs';
+import { filterListings } from './marketplace.js';
 
 (() => {
   'use strict';
