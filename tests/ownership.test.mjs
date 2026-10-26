@@ -72,7 +72,7 @@ assert.ok(otherListing && otherListing.owner !== 'You', `${OTHER_USERS_LISTING_I
 assert.ok(otherHelp && otherHelp.owner !== 'You', `${OTHER_USERS_HELP_ID} must be another user's help post`);
 
 await assertRefused('edit another user\'s listing', 'listings', OTHER_USERS_LISTING_ID,
-  { method: 'PUT', rawBody: JSON.stringify(LISTING_EDIT) }, NOT_FOUND);
+  { method: 'PUT', rawBody: JSON.stringify(LISTING_EDIT) }, FORBIDDEN);
 await assertRefused('mark another user\'s listing sold', 'listings', OTHER_USERS_LISTING_ID,
   { method: 'POST', action: 'sell' }, FORBIDDEN);
 await assertRefused('remove another user\'s listing', 'listings', OTHER_USERS_LISTING_ID,
