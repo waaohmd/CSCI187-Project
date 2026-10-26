@@ -39,7 +39,7 @@ jobs:
           extensions: json
           coverage: none
 
-      - name: Check JavaScript and project structure
+      - name: Check JavaScript, project structure, and unit tests
         run: npm run check
 
       - name: Check PHP syntax
@@ -67,5 +67,4 @@ jobs:
           fi
 
           npm run test:api
-          node tests/help_validation.test.mjs
 

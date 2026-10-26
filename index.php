@@ -94,6 +94,6 @@ header('Content-Type: text/html; charset=utf-8');
     <div class="confirm-box" role="alertdialog" aria-modal="true"><h2>Remove this post?</h2><p>This action cannot be undone.</p><div class="form-actions"><button class="button secondary" id="confirm-cancel">Cancel</button><button class="button danger" id="confirm-delete">Remove</button></div></div>
   </div>
   <div id="toast" class="toast" role="status" aria-live="polite"></div>
-  <script src="assets/app.js" defer></script>
+  <script type="module" src="assets/app.js"></script>
 </body>
 </html>

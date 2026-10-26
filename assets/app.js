@@ -1,3 +1,5 @@
+import { filterListings } from './marketplace.mjs';
+
 (() => {
   'use strict';
 
@@ -137,12 +139,10 @@
   }
 
   function renderMarketplace() {
-    const query = elements.search.value.trim().toLowerCase();
-    const category = elements.category.value;
-    const condition = elements.condition.value;
-    const items = state.listings.filter(item => {
-      const matchesText = !query || `${item.name} ${item.description} ${item.location}`.toLowerCase().includes(query);
-      return matchesText && (category === 'all' || item.category === category) && (condition === 'all' || item.condition === condition);
+    const items = filterListings(state.listings, {
+      query: elements.search.value,
+      category: elements.category.value,
+      condition: elements.condition.value
     });
     elements.listingGrid.innerHTML = items.map(listingCard).join('');
     toggleEmpty(items.length === 0);

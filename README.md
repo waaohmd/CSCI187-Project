@@ -25,9 +25,17 @@ A web app for students to buy and sell used items or request moving and delivery
 
 ## Test
 
-`npm run check`: Run the JavaScript and project structure checks.
+`npm run check`: Check JavaScript syntax and run static smoke checks and unit tests. No PHP server is required.
 
-`npm run test:api`: Test the API while the PHP server is running.
+`npm run test:unit`: Run independent unit tests, including marketplace search and filtering (Marc Guo).
+
+`npm run test:api`: Run all API integration tests while the PHP server is running.
+
+`npm test`: Run every test while the PHP server is running.
+
+The runner automatically discovers `*.test.mjs` files in `tests/` and its subfolders. Name independent unit tests `*.unit.test.mjs`; other test files run as API integration tests, except the existing `smoke.test.mjs` structure check. New files need no changes to `package.json` or CI. Test files run sequentially because integration tests share the data store.
+
+CI runs syntax checks, smoke checks, unit tests, PHP syntax checks, and API integration tests on PHP 8.1 and 8.4. Each contributor should add their name to their test file and choose a different behavior to test. To verify CI, push an intentional failing assertion on a separate branch, wait for a failed run, then remove it and confirm a successful run before merging.
 
 ## Project guidelines
 
