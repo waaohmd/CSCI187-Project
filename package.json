@@ -4,9 +4,9 @@
   "private": true,
   "description": "Student marketplace and moving-help prototype",
   "scripts": {
-    "check:js": "node --check assets/app.js && node --check tests/smoke.test.mjs && node --check tests/api.test.mjs && node --check tests/listing_validation.test.mjs",
+    "check:js": "node --check assets/app.js && node --check tests/smoke.test.mjs && node --check tests/api.test.mjs && node --check tests/listing_validation.test.mjs && node --check tests/ownership.test.mjs",
     "test": "node tests/smoke.test.mjs",
-    "test:api": "node tests/api.test.mjs && node tests/listing_validation.test.mjs",
+    "test:api": "node tests/api.test.mjs && node tests/listing_validation.test.mjs && node tests/ownership.test.mjs",
     "check": "npm run check:js && npm test"
   },
   "engines": {
