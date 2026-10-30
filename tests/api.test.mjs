@@ -20,6 +20,8 @@ async function request(resource, { method = 'GET', id, action, body } = {}) {
 
 const initialListings = await request('listings');
 assert.ok(Array.isArray(initialListings), 'Listings endpoint must return an array');
+const initialHelpPosts = await request('help');
+assert.ok(Array.isArray(initialHelpPosts), 'Help endpoint must return an array');
 
 let listingId;
 let helpId;
@@ -40,6 +42,12 @@ try {
   listingId = listing.id;
   assert.equal(listing.owner, 'You');
   assert.equal(listing.status, 'available');
+  const listingsAfterCreate = await request('listings');
+  assert.equal(listingsAfterCreate.length, initialListings.length + 1, 'Creating must add a listing');
+  assert.ok(
+    initialListings.every(initial => listingsAfterCreate.some(current => current.id === initial.id)),
+    'Creating a listing must not replace existing listings'
+  );
 
   const updatedListing = await request('listings', {
     method: 'PUT',
@@ -75,6 +83,12 @@ try {
   });
   helpId = help.id;
   assert.equal(help.status, 'open');
+  const helpPostsAfterCreate = await request('help');
+  assert.equal(helpPostsAfterCreate.length, initialHelpPosts.length + 1, 'Creating must add a help post');
+  assert.ok(
+    initialHelpPosts.every(initial => helpPostsAfterCreate.some(current => current.id === initial.id)),
+    'Creating a help post must not replace existing help posts'
+  );
 
   const updatedHelp = await request('help', {
     method: 'PUT',

@@ -39,7 +39,7 @@ jobs:
           extensions: json
           coverage: none
 
-      - name: Check JavaScript, project structure, and unit tests
+      - name: Check JavaScript and unit tests
         run: npm run check
 
       - name: Check PHP syntax

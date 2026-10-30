@@ -6,3 +6,8 @@ export function filterListings(listings, { query = '', category = 'all', conditi
     return matchesText && (category === 'all' || item.category === category) && (condition === 'all' || item.condition === condition);
   });
 }
+
+export function savePostInCollection(posts, savedPost, editedPostId = '') {
+  if (!editedPostId) return [savedPost, ...posts];
+  return posts.map(post => post.id === editedPostId ? savedPost : post);
+}

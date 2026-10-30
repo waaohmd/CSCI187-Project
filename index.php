@@ -13,7 +13,7 @@ header('Content-Type: text/html; charset=utf-8');
 </head>
 <body>
   <header class="site-header">
-    <a href="#" class="brand">Campus Marketplace</a>
+    <a href="#marketplace" class="brand" data-view="marketplace">Campus Marketplace</a>
     <nav aria-label="Main navigation">
       <button class="nav-button active" data-view="marketplace">Marketplace</button>
       <button class="nav-button" data-view="help">Moving help</button>
@@ -24,13 +24,13 @@ header('Content-Type: text/html; charset=utf-8');
   <main class="container">
     <div class="page-heading">
       <div><h1 id="page-title">Items for sale</h1><p id="page-description">Buy used items from students nearby.</p></div>
-      <div class="heading-actions">
-        <button class="button secondary" data-open-form="help">Post moving help</button>
-        <button class="button primary" data-open-form="listing">List an item</button>
-      </div>
     </div>
 
     <section id="marketplace-view" class="view-panel">
+      <div class="marketplace-actions">
+        <button class="button secondary" data-open-form="help">Post moving help</button>
+        <button class="button primary" data-open-form="listing">List an item</button>
+      </div>
       <div class="filters">
         <label>Search<input id="search" type="search" placeholder="Search items"></label>
         <label>Category<select id="category-filter"><option value="all">All categories</option><option>Furniture</option><option>Appliances</option><option>Electronics</option><option>Clothing</option><option>School supplies</option><option>Other</option></select></label>

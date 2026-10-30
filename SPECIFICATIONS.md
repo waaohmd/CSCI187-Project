@@ -5,8 +5,9 @@ These specifications describe how the walking skeleton behaves. Each one maps to
 ## Architecture
 
 - **Frontend:** `index.php` renders the page; `assets/app.js` handles views, forms, and API calls; `assets/styles.css` styles the page.
-- **Backend:** `api.php` is a JSON REST API that validates input and enforces post ownership.
-- **Storage:** `data/store.json` holds the `listings` and `help_posts` arrays. `api.php` locks the file on every read and write.
+- **Controller:** `api.php` routes HTTP requests and translates domain or persistence errors into JSON responses.
+- **Domain:** `src/Domain.php` contains plain validation, ownership, and post lookup functions.
+- **Storage:** `src/Store.php` reads and writes the `listings` and `help_posts` arrays in `data/store.json` with file locking.
 - **Preview mode:** When the PHP API is unreachable, `assets/app.js` loads `data/store.json` and saves changes in the browser's `localStorage` instead.
 
 ## Specifications for posting items
@@ -24,11 +25,13 @@ These specifications describe how the walking skeleton behaves. Each one maps to
 
 ## Specifications for browsing
 
-1. The Marketplace page displays every listing's photo, name, price, category, condition, description, pickup location, and seller, newest first.
-2. When the user types in **Search**, the system shows only listings whose name, description, or pickup location contains the text, ignoring case.
-3. When the user selects a **Category** or **Condition** filter, the system shows only listings that match every selected filter.
-4. When no listing matches, the system shows "No posts found".
-5. The system keeps sold listings visible with a **Sold** badge.
+1. When the user clicks **Campus Marketplace**, the system opens the Marketplace page.
+2. The system displays **Post moving help** and **List an item** only on the Marketplace page.
+3. The Marketplace page displays every listing's photo, name, price, category, condition, description, pickup location, and seller, newest first.
+4. When the user types in **Search**, the system shows only listings whose name, description, or pickup location contains the text, ignoring case.
+5. When the user selects a **Category** or **Condition** filter, the system shows only listings that match every selected filter.
+6. When no listing matches, the system shows "No posts found".
+7. The system keeps sold listings visible with a **Sold** badge.
 
 ## Specifications for managing posts
 

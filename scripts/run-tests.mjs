@@ -18,28 +18,42 @@ async function filesIn(directory) {
   return files.flat().sort();
 }
 
-function run(arguments_) {
-  const result = spawnSync(process.execPath, arguments_, { cwd: root, stdio: 'inherit' });
+function run(command, arguments_) {
+  const result = spawnSync(command, arguments_, { cwd: root, stdio: 'inherit' });
   if (result.error) throw result.error;
   if (result.status !== 0) process.exit(result.status ?? 1);
+}
+
+function runNode(arguments_) {
+  run(process.execPath, arguments_);
 }
 
 if (mode === 'syntax') {
   for (const directory of ['assets', 'scripts', 'tests']) {
     for (const file of await filesIn(directory)) {
-      if (/\.(mjs|js)$/.test(file)) run(['--check', file]);
+      if (/\.(mjs|js)$/.test(file)) runNode(['--check', file]);
     }
   }
 } else {
-  const files = (await filesIn('tests')).filter(file => {
-    if (!file.endsWith('.test.mjs')) return false;
-    if (mode === 'all') return true;
-    const isUnit = file.endsWith('.unit.test.mjs');
-    if (mode === 'unit') return isUnit;
-    return !isUnit && path.basename(file) !== 'smoke.test.mjs';
-  });
-  if (files.length === 0) throw new Error(`No test files found for ${mode}`);
-  console.log(`Running ${mode} tests: ${files.join(', ')}`);
-  // API tests share the data store, so run files sequentially to avoid races.
-  run(['--test', '--test-concurrency=1', ...files]);
+  const testFiles = await filesIn('tests');
+  const javaScriptUnitTests = testFiles.filter(file => file.endsWith('.unit.test.mjs'));
+  const phpUnitTests = testFiles.filter(file => file.endsWith('.unit.php'));
+  const apiTests = testFiles.filter(file => file.endsWith('.test.mjs') && !file.endsWith('.unit.test.mjs'));
+
+  if (mode === 'all' || mode === 'unit') {
+    console.log(`Running unit tests: ${[...javaScriptUnitTests, ...phpUnitTests].join(', ')}`);
+    if (javaScriptUnitTests.length > 0) {
+      runNode(['--test', ...javaScriptUnitTests]);
+    }
+    for (const phpUnitTest of phpUnitTests) {
+      run('php', [phpUnitTest]);
+    }
+  }
+
+  if (mode === 'all' || mode === 'api') {
+    if (apiTests.length === 0) throw new Error('No API tests found');
+    console.log(`Running API tests: ${apiTests.join(', ')}`);
+    // API tests share the data store, so run files sequentially to avoid races.
+    runNode(['--test', '--test-concurrency=1', ...apiTests]);
+  }
 }

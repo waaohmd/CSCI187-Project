@@ -9,8 +9,7 @@
     "test": "node scripts/run-tests.mjs",
     "test:unit": "node scripts/run-tests.mjs unit",
     "test:api": "node scripts/run-tests.mjs api",
-    "test:smoke": "node tests/smoke.test.mjs",
-    "check": "npm run check:js && npm run test:smoke && npm run test:unit"
+    "check": "npm run check:js && npm run test:unit"
   },
   "engines": {
     "node": ">=20"

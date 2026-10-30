@@ -1,4 +1,4 @@
-import { filterListings } from './marketplace.js';
+import { filterListings, savePostInCollection } from './marketplace.js';
 
 (() => {
   'use strict';
@@ -243,8 +243,7 @@ import { filterListings } from './marketplace.js';
   }
 
   function updateStateRecord(key, saved, id) {
-    if (!id) state[key].unshift(saved);
-    else state[key] = state[key].map(item => item.id === id ? saved : item);
+    state[key] = savePostInCollection(state[key], saved, id);
   }
 
   function handlePostAction(button) {
