@@ -5,7 +5,8 @@ These specifications describe how the walking skeleton behaves. Each one maps to
 ## Architecture
 
 - **Frontend:** `index.php` renders the page; `assets/app.js` handles views, forms, and API calls; `assets/styles.css` styles the page.
-- **Controller:** `api.php` routes HTTP requests and translates domain or persistence errors into JSON responses.
+- **Controller:** `api.php` routes HTTP requests to the model and translates its errors into JSON responses. It contains no business rules.
+- **Model:** `src/PostModel.php` lists, creates, updates, sells, and removes posts.
 - **Domain:** `src/Domain.php` contains plain validation, ownership, and post lookup functions.
 - **Storage:** `src/Store.php` reads and writes the `listings` and `help_posts` arrays in `data/store.json` with file locking.
 - **Preview mode:** When the PHP API is unreachable, `assets/app.js` loads `data/store.json` and saves changes in the browser's `localStorage` instead.

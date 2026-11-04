@@ -1,4 +1,4 @@
-import { filterListings, savePostInCollection } from './marketplace.js';
+import { fillPostForm, filterListings, savePostInCollection } from './marketplace.js';
 
 (() => {
   'use strict';
@@ -189,8 +189,7 @@ import { filterListings, savePostInCollection } from './marketplace.js';
     elements.listingForm.hidden = !listing; elements.helpForm.hidden = listing;
     elements.formTitle.textContent = item ? (listing ? 'Edit listing' : 'Edit help post') : (listing ? 'List an item' : 'Post moving help');
     const form = listing ? elements.listingForm : elements.helpForm;
-    form.reset();
-    if (item) Object.entries(item).forEach(([key, value]) => { if (form.elements[key] && key !== 'photos') form.elements[key].value = value; });
+    fillPostForm(form, item);
     if (listing) {
       state.photos = [...(item?.photos || [])]; renderPhotoPreview();
       $('#listing-submit').textContent = item ? 'Save changes' : 'Publish listing';

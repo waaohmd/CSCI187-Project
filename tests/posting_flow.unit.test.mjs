@@ -1,6 +1,32 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { savePostInCollection } from '../assets/marketplace.js';
+import { fillPostForm, savePostInCollection } from '../assets/marketplace.js';
+
+// Like a real form, reset() clears visible fields but leaves the hidden id unchanged.
+function fakePostForm() {
+  const elements = { id: { value: '' }, name: { value: '' }, photos: { value: '' } };
+  return { elements, reset() { elements.name.value = ''; elements.photos.value = ''; } };
+}
+
+test('editing a post fills the form with its id and fields', () => {
+  const form = fakePostForm();
+
+  fillPostForm(form, { id: 'lst_existing', name: 'Desk', photos: ['assets/desk.svg'], status: 'available' });
+
+  assert.equal(form.elements.id.value, 'lst_existing');
+  assert.equal(form.elements.name.value, 'Desk');
+  assert.equal(form.elements.photos.value, '');
+});
+
+test('opening a new post form after editing clears the edited post id', () => {
+  const form = fakePostForm();
+  fillPostForm(form, { id: 'lst_existing', name: 'Desk' });
+
+  fillPostForm(form);
+
+  assert.equal(form.elements.id.value, '');
+  assert.equal(form.elements.name.value, '');
+});
 
 test('creating a listing adds it without replacing an existing listing', () => {
   const existing = [{ id: 'lst_existing', name: 'Desk' }];

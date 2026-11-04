@@ -5,6 +5,7 @@ namespace CampusMarketplace\Domain;
 
 use RuntimeException;
 
+const CURRENT_OWNER = 'You';
 const MAX_PHOTOS = 4;
 const LISTING_CATEGORIES = ['Furniture', 'Appliances', 'Electronics', 'Clothing', 'School supplies', 'Other'];
 const LISTING_CONDITIONS = ['Like new', 'Good', 'Fair', 'Well loved'];
@@ -19,6 +20,10 @@ final class ValidationError extends RuntimeException
 }
 
 final class OwnershipError extends RuntimeException
+{
+}
+
+final class PostNotFoundError extends RuntimeException
 {
 }
 
@@ -83,7 +88,7 @@ function validateListing(array $data, ?array $existingListing = null): array
         : ($existingListing['photos'] ?? []);
 
     return [
-        'owner' => $existingListing['owner'] ?? 'You',
+        'owner' => $existingListing['owner'] ?? CURRENT_OWNER,
         'name' => requiredText($data, 'name', 80, 'Item name'),
         'description' => requiredText($data, 'description', 800, 'Description'),
         'photos' => $photos,
@@ -107,7 +112,7 @@ function validateHelpPost(array $data, ?array $existingHelpPost = null): array
     }
 
     return [
-        'owner' => $existingHelpPost['owner'] ?? 'You',
+        'owner' => $existingHelpPost['owner'] ?? CURRENT_OWNER,
         'title' => requiredText($data, 'title', 100, 'Title'),
         'type' => allowedValue($data, 'type', HELP_TYPES, 'Help type'),
         'from_location' => requiredText($data, 'from_location', 120, 'From location'),
