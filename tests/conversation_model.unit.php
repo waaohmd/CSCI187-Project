@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+// Author: Abhinav Raghavendra
+
 require_once __DIR__ . '/../src/ConversationModel.php';
 require_once __DIR__ . '/php_test_helpers.php';
 
