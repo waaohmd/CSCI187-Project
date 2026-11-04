@@ -348,7 +348,12 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
 
   async function refreshConversations() {
     if (state.view !== 'messages' || !state.user) return;
-    try { await loadConversations(); renderMessages(); } catch (error) { showToast(error.message, true); }
+    try {
+      await loadConversations(); renderMessages();
+    } catch (error) {
+      // A refresh already in flight fails harmlessly when the user signs out.
+      if (state.user) showToast(error.message, true);
+    }
   }
 
   async function readPhotos(files) {
