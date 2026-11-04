@@ -1,5 +1,5 @@
 // Author: Marc Guo
-// Unit tests for the walking skeleton's browsing specifications 2, 3, and 5.
+// Unit tests for the search and filter specifications in SPECIFICATIONS.md.
 // Exercise the same pure function used by the page without HTTP, storage, or DOM mocks.
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
@@ -19,7 +19,7 @@ const cases = [
   { name: 'search matches a name ignoring case and surrounding whitespace', filters: { query: '  OAK  ' }, expected: ['desk'] },
   { name: 'search also matches descriptions', filters: { query: 'bright led' }, expected: ['lamp'] },
   { name: 'search also matches pickup locations', filters: { query: 'WEST HALL' }, expected: ['desk', 'fridge'] },
-  { name: 'search does not match category text alone', filters: { query: 'Electronics' }, expected: [] },
+  { name: 'search also matches categories', filters: { query: 'electronics' }, expected: ['lamp'] },
   { name: 'category excludes matching-condition items in other categories', filters: { category: 'Furniture' }, expected: ['desk', 'chair'] },
   { name: 'condition excludes other conditions in the same category', filters: { condition: 'Good' }, expected: ['desk', 'lamp'] },
   { name: 'category and condition must both match', filters: { category: 'Furniture', condition: 'Good' }, expected: ['desk'] },

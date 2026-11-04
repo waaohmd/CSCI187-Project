@@ -18,7 +18,14 @@ header('Content-Type: text/html; charset=utf-8');
       <button class="nav-button active" data-view="marketplace">Marketplace</button>
       <button class="nav-button" data-view="help">Moving help</button>
       <button class="nav-button" data-view="mine">My posts</button>
+      <button class="nav-button" data-view="messages">Messages</button>
+      <button class="nav-button" data-view="profile">Profile</button>
     </nav>
+    <div class="account-actions">
+      <span id="account-name" class="meta" hidden></span>
+      <button class="button secondary" id="sign-in-button">Sign in</button>
+      <button class="button secondary" id="sign-out-button" hidden>Sign out</button>
+    </div>
   </header>
 
   <main class="container">
@@ -47,6 +54,37 @@ header('Content-Type: text/html; charset=utf-8');
         <div><h2>My listings</h2><div id="my-listings" class="post-list"></div></div>
         <div><h2>My help posts</h2><div id="my-help" class="post-list"></div></div>
       </div>
+    </section>
+
+    <section id="messages-view" class="view-panel" hidden>
+      <div class="messages-layout">
+        <div id="conversation-list" class="post-list"></div>
+        <div id="conversation-panel" class="conversation-panel" hidden>
+          <div id="conversation-heading"></div>
+          <form id="locations-form" class="post-form">
+            <div class="form-row">
+              <label>Pickup location<input name="pickup_location" maxlength="120"></label>
+              <label>Drop-off location<input name="dropoff_location" maxlength="120"></label>
+            </div>
+            <div class="form-actions"><button type="submit" class="button secondary">Save locations</button></div>
+          </form>
+          <div id="message-list" class="message-list" aria-live="polite"></div>
+          <form id="message-form" class="message-form">
+            <label>Message<textarea name="body" required maxlength="1000" rows="2"></textarea></label>
+            <button type="submit" class="button primary">Send</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section id="profile-view" class="view-panel" hidden>
+      <form id="profile-form" class="post-form profile-form">
+        <div id="profile-status"></div>
+        <label>Name<input name="name" required maxlength="80"></label>
+        <label>Residence<input name="residence" maxlength="100" placeholder="Dorm or apartment"></label>
+        <label>Bio<textarea name="bio" maxlength="300" rows="4"></textarea></label>
+        <div class="form-actions"><button type="submit" class="button primary">Save profile</button></div>
+      </form>
     </section>
 
     <div class="empty-state" id="empty-state" hidden><h2>No posts found</h2><p>Create a new post or change your filters.</p></div>
@@ -79,14 +117,43 @@ header('Content-Type: text/html; charset=utf-8');
         <label>Type<select name="type" required><option>Delivery</option><option>Moving & lifting</option><option>Hauling</option><option>Driving</option></select></label>
         <label>Cash offer ($)<input name="offer" type="number" required min="1" max="10000" step="1"></label>
       </div>
-      <label>From<input name="from_location" required maxlength="120" placeholder="Pickup location"></label>
-      <label>To<input name="to_location" required maxlength="120" placeholder="Destination"></label>
+      <label>Pickup location<input name="from_location" required maxlength="120"></label>
+      <label>Drop-off location<input name="to_location" required maxlength="120"></label>
       <div class="form-row">
         <label>Date<input name="date" type="date" required></label>
         <label>Preferred time<input name="time" type="time" required></label>
       </div>
       <label>Details<textarea name="details" required maxlength="600" rows="4"></textarea></label>
       <div class="form-actions"><button type="button" class="button secondary" data-close-dialog>Cancel</button><button type="submit" class="button primary" id="help-submit">Post request</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="detail-dialog">
+    <div class="dialog-heading"><h2 id="detail-title"></h2><button class="icon-button" data-close-dialog aria-label="Close">×</button></div>
+    <div id="detail-body"></div>
+  </dialog>
+
+  <dialog id="respond-dialog">
+    <div class="dialog-heading"><h2 id="respond-title"></h2><button class="icon-button" data-close-dialog aria-label="Close">×</button></div>
+    <form id="respond-form" class="post-form">
+      <label>Message<textarea name="message" required maxlength="1000" rows="4"></textarea></label>
+      <label id="respond-dropoff">Drop-off location (optional)<input name="dropoff_location" maxlength="120"></label>
+      <div class="form-actions"><button type="button" class="button secondary" data-close-dialog>Cancel</button><button type="submit" class="button primary">Send response</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="auth-dialog">
+    <div class="dialog-heading"><h2 id="auth-title">Sign in</h2><button class="icon-button" data-close-dialog aria-label="Close">×</button></div>
+    <form id="login-form" class="post-form">
+      <label>SCU email<input name="email" type="email" required autocomplete="username"></label>
+      <label>Password<input name="password" type="password" required autocomplete="current-password"></label>
+      <div class="form-actions"><button type="button" class="button secondary" data-auth-mode="register">Create an account</button><button type="submit" class="button primary">Sign in</button></div>
+    </form>
+    <form id="register-form" class="post-form" hidden>
+      <label>Name<input name="name" required maxlength="80" autocomplete="name"></label>
+      <label>SCU email<input name="email" type="email" required placeholder="you@scu.edu" autocomplete="username"></label>
+      <label>Password (8 to 72 characters)<input name="password" type="password" required minlength="8" maxlength="72" autocomplete="new-password"></label>
+      <div class="form-actions"><button type="button" class="button secondary" data-auth-mode="login">I have an account</button><button type="submit" class="button primary">Create account</button></div>
     </form>
   </dialog>
 

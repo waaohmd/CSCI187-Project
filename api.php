@@ -1,20 +1,35 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/src/Domain.php';
-require_once __DIR__ . '/src/Store.php';
+require_once __DIR__ . '/src/PostModel.php';
+require_once __DIR__ . '/src/UserModel.php';
+require_once __DIR__ . '/src/ConversationModel.php';
 
+use CampusMarketplace\Domain\AuthenticationError;
+use CampusMarketplace\Domain\ConflictError;
+use CampusMarketplace\Domain\NotFoundError;
 use CampusMarketplace\Domain\OwnershipError;
 use CampusMarketplace\Domain\ValidationError;
-use function CampusMarketplace\Domain\assertPostOwned;
-use function CampusMarketplace\Domain\findPostIndex;
-use function CampusMarketplace\Domain\validateHelpPost;
-use function CampusMarketplace\Domain\validateListing;
-use function CampusMarketplace\Persistence\readStore;
-use function CampusMarketplace\Persistence\writeStore;
+use function CampusMarketplace\Model\authenticateUser;
+use function CampusMarketplace\Model\closeHelpPost;
+use function CampusMarketplace\Model\createPost;
+use function CampusMarketplace\Model\findAccount;
+use function CampusMarketplace\Model\getConversation;
+use function CampusMarketplace\Model\getPublicProfile;
+use function CampusMarketplace\Model\isKnownResource;
+use function CampusMarketplace\Model\listConversations;
+use function CampusMarketplace\Model\listPosts;
+use function CampusMarketplace\Model\registerUser;
+use function CampusMarketplace\Model\removePost;
+use function CampusMarketplace\Model\respondToPost;
+use function CampusMarketplace\Model\sellListing;
+use function CampusMarketplace\Model\sendMessage;
+use function CampusMarketplace\Model\updateMeetingLocations;
+use function CampusMarketplace\Model\updatePost;
+use function CampusMarketplace\Model\updateProfile;
 
-const DATA_FILE = __DIR__ . '/data/store.json';
-const CURRENT_OWNER = 'You';
+// Integration tests point this at a temporary copy so they never change real data.
+define('DATA_FILE', getenv('MARKETPLACE_DATA_FILE') ?: __DIR__ . '/data/store.json');
 
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: no-store');
@@ -37,104 +52,146 @@ function requestBody(): array
     return $data;
 }
 
-function validatedRecord(string $resource, array $data, ?array $existingPost = null): array
+function signedInUserId(): string
 {
-    try {
-        return $resource === 'listings'
-            ? validateListing($data, $existingPost)
-            : validateHelpPost($data, $existingPost);
-    } catch (ValidationError $error) {
-        respond(422, ['error' => $error->getMessage(), 'field' => $error->field]);
+    $userId = (string) ($_SESSION['user_id'] ?? '');
+    if ($userId === '') {
+        throw new AuthenticationError('Sign in to continue.');
     }
+
+    return $userId;
 }
 
-function persistStore(array $store): void
+function startSession(array $account): void
 {
-    try {
-        writeStore(DATA_FILE, $store);
-    } catch (\RuntimeException $error) {
-        respond(500, ['error' => $error->getMessage()]);
-    }
+    session_regenerate_id(true);
+    $_SESSION['user_id'] = $account['id'];
 }
 
-function requireOwnedPost(array $post): void
+function routeAuth(string $method, string $action): never
 {
-    try {
-        assertPostOwned($post, CURRENT_OWNER);
-    } catch (OwnershipError $error) {
-        respond(403, ['error' => $error->getMessage()]);
+    if ($method === 'GET') {
+        $userId = (string) ($_SESSION['user_id'] ?? '');
+        respond(200, ['data' => $userId === '' ? null : findAccount(DATA_FILE, $userId)]);
     }
+    if ($method !== 'POST') {
+        respond(405, ['error' => 'Method not allowed.']);
+    }
+    if ($action === 'register') {
+        $account = registerUser(DATA_FILE, requestBody());
+        startSession($account);
+        respond(201, ['data' => $account]);
+    }
+    if ($action === 'login') {
+        $account = authenticateUser(DATA_FILE, requestBody());
+        startSession($account);
+        respond(200, ['data' => $account]);
+    }
+    if ($action === 'logout') {
+        $_SESSION = [];
+        session_destroy();
+        respond(200, ['data' => null]);
+    }
+    respond(404, ['error' => 'Unknown action.']);
 }
 
-$resource = $_GET['resource'] ?? '';
-$collection = match ($resource) {
-    'listings' => 'listings',
-    'help' => 'help_posts',
-    default => null,
-};
-if ($collection === null) {
+function routeProfile(string $method, string $userId): never
+{
+    if ($method === 'GET') {
+        respond(200, ['data' => getPublicProfile(DATA_FILE, $userId)]);
+    }
+    if ($method === 'PUT') {
+        respond(200, ['data' => updateProfile(DATA_FILE, signedInUserId(), requestBody())]);
+    }
+    respond(405, ['error' => 'Method not allowed.']);
+}
+
+function routeConversations(string $method, string $conversationId, string $action): never
+{
+    $userId = signedInUserId();
+    if ($method === 'GET' && $conversationId === '') {
+        respond(200, ['data' => listConversations(DATA_FILE, $userId)]);
+    }
+    if ($method === 'GET') {
+        respond(200, ['data' => getConversation(DATA_FILE, $userId, $conversationId)]);
+    }
+    if ($method === 'POST' && $conversationId === '') {
+        respond(201, ['data' => respondToPost(DATA_FILE, $userId, requestBody())]);
+    }
+    if ($method === 'POST' && $action === 'message') {
+        respond(201, ['data' => sendMessage(DATA_FILE, $userId, $conversationId, requestBody())]);
+    }
+    if ($method === 'PUT' && $conversationId !== '') {
+        respond(200, ['data' => updateMeetingLocations(DATA_FILE, $userId, $conversationId, requestBody())]);
+    }
+    respond(405, ['error' => 'Method not allowed.']);
+}
+
+function routePosts(string $method, string $resource, string $postId, string $action): never
+{
+    if ($method === 'GET') {
+        respond(200, ['data' => listPosts(DATA_FILE, $resource)]);
+    }
+    if (!in_array($method, ['POST', 'PUT', 'DELETE'], true)) {
+        respond(405, ['error' => 'Method not allowed.']);
+    }
+
+    $userId = signedInUserId();
+    if ($method === 'POST' && $postId !== '' && $resource === 'listings' && $action === 'sell') {
+        respond(200, ['data' => sellListing(DATA_FILE, $userId, $postId)]);
+    }
+    if ($method === 'POST' && $postId !== '' && $resource === 'help' && $action === 'close') {
+        respond(200, ['data' => closeHelpPost(DATA_FILE, $userId, $postId)]);
+    }
+    if ($method === 'POST') {
+        respond(201, ['data' => createPost(DATA_FILE, $resource, $userId, requestBody())]);
+    }
+    if ($postId === '') {
+        respond(400, ['error' => 'A post ID is required.']);
+    }
+    if ($method === 'PUT') {
+        respond(200, ['data' => updatePost(DATA_FILE, $resource, $userId, $postId, requestBody())]);
+    }
+    respond(200, ['data' => removePost(DATA_FILE, $resource, $userId, $postId)]);
+}
+
+function routeRequest(string $method, string $resource, string $recordId, string $action): never
+{
+    if ($resource === 'auth') {
+        routeAuth($method, $action);
+    }
+    if ($resource === 'profile') {
+        routeProfile($method, $recordId);
+    }
+    if ($resource === 'conversations') {
+        routeConversations($method, $recordId, $action);
+    }
+    if (isKnownResource($resource)) {
+        routePosts($method, $resource, $recordId, $action);
+    }
     respond(404, ['error' => 'Unknown resource.']);
 }
 
+session_set_cookie_params(['path' => '/', 'httponly' => true, 'samesite' => 'Strict']);
+session_start();
+
 try {
-    $store = readStore(DATA_FILE);
+    routeRequest(
+        $_SERVER['REQUEST_METHOD'] ?? 'GET',
+        (string) ($_GET['resource'] ?? ''),
+        trim((string) ($_GET['id'] ?? '')),
+        trim((string) ($_GET['action'] ?? ''))
+    );
+} catch (ValidationError $error) {
+    respond(422, ['error' => $error->getMessage(), 'field' => $error->field]);
+} catch (AuthenticationError $error) {
+    respond(401, ['error' => $error->getMessage()]);
+} catch (OwnershipError $error) {
+    respond(403, ['error' => $error->getMessage()]);
+} catch (NotFoundError $error) {
+    respond(404, ['error' => $error->getMessage()]);
+} catch (ConflictError $error) {
+    respond(409, ['error' => $error->getMessage()]);
 } catch (\RuntimeException $error) {
     respond(500, ['error' => $error->getMessage()]);
 }
-
-$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
-if ($method === 'GET') {
-    respond(200, ['data' => $store[$collection]]);
-}
-
-$postId = trim((string) ($_GET['id'] ?? ''));
-$action = trim((string) ($_GET['action'] ?? ''));
-
-if ($method === 'POST' && $postId !== '' && $resource === 'listings' && $action === 'sell') {
-    $postIndex = findPostIndex($store[$collection], $postId);
-    if ($postIndex < 0) {
-        respond(404, ['error' => 'Listing not found.']);
-    }
-    requireOwnedPost($store[$collection][$postIndex]);
-    $store[$collection][$postIndex]['status'] = 'sold';
-    $store[$collection][$postIndex]['updated_at'] = gmdate('c');
-    persistStore($store);
-    respond(200, ['data' => $store[$collection][$postIndex]]);
-}
-
-if ($method === 'POST') {
-    $record = validatedRecord($resource, requestBody());
-    $record = array_merge([
-        'id' => ($resource === 'listings' ? 'lst_' : 'hlp_') . bin2hex(random_bytes(5)),
-    ], $record, ['created_at' => gmdate('c')]);
-    array_unshift($store[$collection], $record);
-    persistStore($store);
-    respond(201, ['data' => $record]);
-}
-
-if ($postId === '') {
-    respond(400, ['error' => 'A post ID is required.']);
-}
-
-$postIndex = findPostIndex($store[$collection], $postId);
-if ($postIndex < 0) {
-    respond(404, ['error' => 'Post not found.']);
-}
-requireOwnedPost($store[$collection][$postIndex]);
-
-if ($method === 'PUT') {
-    $existingPost = $store[$collection][$postIndex];
-    $validatedPost = validatedRecord($resource, requestBody(), $existingPost);
-    $store[$collection][$postIndex] = array_merge($existingPost, $validatedPost, ['updated_at' => gmdate('c')]);
-    persistStore($store);
-    respond(200, ['data' => $store[$collection][$postIndex]]);
-}
-
-if ($method === 'DELETE') {
-    $deletedPost = $store[$collection][$postIndex];
-    array_splice($store[$collection], $postIndex, 1);
-    persistStore($store);
-    respond(200, ['data' => $deletedPost]);
-}
-
-respond(405, ['error' => 'Method not allowed.']);

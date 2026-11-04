@@ -1,0 +1,85 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="CRC" id="crc">
+    <mxGraphModel dx="1413" dy="927" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1200" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="main" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="Main Page" vertex="1">
+          <mxGeometry height="226" width="340" x="430" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="main_r" parent="main" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Listings and open help posts&lt;/li&gt;&lt;li&gt;For Sale / Moving Help tabs&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Add a new post to the page&lt;/li&gt;&lt;li&gt;Hide closed help posts&lt;/li&gt;&lt;li&gt;Badge sold listings&lt;/li&gt;&lt;li&gt;Show posts by section&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="196" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="main_c" parent="main" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Post&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="196" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="User" vertex="1">
+          <mxGeometry height="300" width="340" x="40" y="316" as="geometry" />
+        </mxCell>
+        <mxCell id="user_r" parent="user" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;User ID, name&lt;/li&gt;&lt;li&gt;SCU email&lt;/li&gt;&lt;li&gt;Verified SCU status&lt;/li&gt;&lt;li&gt;Residence, bio&lt;/li&gt;&lt;li&gt;Posts they created&lt;/li&gt;&lt;li&gt;Chats they belong to&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Sign in and out&lt;/li&gt;&lt;li&gt;Create, edit, delete posts&lt;/li&gt;&lt;li&gt;Start a chat about a post&lt;/li&gt;&lt;li&gt;Update profile&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="270" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="user_c" parent="user" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Post&lt;/li&gt;&lt;li&gt;Chat&lt;/li&gt;&lt;li&gt;Message&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="270" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="post" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="Post" vertex="1">
+          <mxGeometry height="318" width="340" x="430" y="316" as="geometry" />
+        </mxCell>
+        <mxCell id="post_r" parent="post" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Post ID&lt;/li&gt;&lt;li&gt;Owner (User)&lt;/li&gt;&lt;li&gt;Item (For Sale posts)&lt;/li&gt;&lt;li&gt;Type: For Sale / Moving Help&lt;/li&gt;&lt;li&gt;Pickup location&lt;/li&gt;&lt;li&gt;Drop-off (Moving Help posts)&lt;/li&gt;&lt;li&gt;Status: available / sold or open / closed&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Show item and owner details&lt;/li&gt;&lt;li&gt;Update its status&lt;/li&gt;&lt;li&gt;Open a chat with the owner&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="288" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="post_c" parent="post" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;User&lt;/li&gt;&lt;li&gt;Item&lt;/li&gt;&lt;li&gt;Chat&lt;/li&gt;&lt;li&gt;Main Page&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="288" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="item" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="Item" vertex="1">
+          <mxGeometry height="242" width="340" x="820" y="316" as="geometry" />
+        </mxCell>
+        <mxCell id="item_r" parent="item" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Stored on its For Sale post&lt;/li&gt;&lt;li&gt;Description&lt;/li&gt;&lt;li&gt;Photos&lt;/li&gt;&lt;li&gt;Price&lt;/li&gt;&lt;li&gt;Category, condition&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Update its details&lt;/li&gt;&lt;li&gt;Give a summary for display&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="212" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="item_c" parent="item" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Post&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="212" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="message" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="Message" vertex="1">
+          <mxGeometry height="242" width="340" x="40" y="674" as="geometry" />
+        </mxCell>
+        <mxCell id="message_r" parent="message" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Message ID&lt;/li&gt;&lt;li&gt;Sender (User)&lt;/li&gt;&lt;li&gt;Text&lt;/li&gt;&lt;li&gt;Timestamp&lt;/li&gt;&lt;li&gt;Chat ID&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Show sender, text and time&lt;/li&gt;&lt;li&gt;Add itself to its chat&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="212" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="message_c" parent="message" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;User&lt;/li&gt;&lt;li&gt;Chat&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="212" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="chat" parent="1" style="swimlane;fontStyle=1;fontSize=16;startSize=30;fillColor=#fff2cc;strokeColor=#d6b656;swimlaneFillColor=#fffbe6;html=1;" value="Chat" vertex="1">
+          <mxGeometry height="264" width="340" x="430" y="674" as="geometry" />
+        </mxCell>
+        <mxCell id="chat_r" parent="chat" style="text;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=none;fillColor=none;" value="&lt;b&gt;KNOWS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Chat ID&lt;/li&gt;&lt;li&gt;Participants (2 users)&lt;/li&gt;&lt;li&gt;Post it is about&lt;/li&gt;&lt;li&gt;List of messages&lt;/li&gt;&lt;li&gt;Pickup / drop-off locations&lt;/li&gt;&lt;/ul&gt;&lt;b&gt;DOES&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;Send a message&lt;/li&gt;&lt;li&gt;Show message history&lt;/li&gt;&lt;li&gt;Save locations&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="234" width="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="chat_c" parent="chat" style="text;html=1;align=left;verticalAlign=top;spacingLeft=6;spacingTop=4;whiteSpace=wrap;fontSize=12;strokeColor=#d6b656;fillColor=none;" value="&lt;b&gt;COLLABORATORS&lt;/b&gt;&lt;ul style=&#39;margin:2px 0 8px 0;padding-left:18px&#39;&gt;&lt;li&gt;User&lt;/li&gt;&lt;li&gt;Post&lt;/li&gt;&lt;li&gt;Message&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="234" width="115" x="225" y="30" as="geometry" />
+        </mxCell>
+        <mxCell id="e0" edge="1" parent="1" source="main" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=none;" target="post" value="lists">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e1" edge="1" parent="1" source="post" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=block;endFill=1;" target="user" value="owned by">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e2" edge="1" parent="1" source="item" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=block;endFill=1;" target="post" value="part of">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e3" edge="1" parent="1" source="post" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=none;" target="chat" value="about">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e4" edge="1" parent="1" source="message" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=block;endFill=1;" target="chat" value="part of">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e5" edge="1" parent="1" source="user" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=none;" target="message" value="sender">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e6" edge="1" parent="1" source="user" style="edgeStyle=none;html=1;fontSize=11;labelBackgroundColor=#ffffff;strokeWidth=1.5;endArrow=none;" target="chat" value="participant">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

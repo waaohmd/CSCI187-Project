@@ -1,11 +1,51 @@
 {
+  "users": [
+    {
+      "id": "usr_hue",
+      "name": "Hue N.",
+      "email": "hue.n@scu.edu",
+      "password_hash": "",
+      "residence": "Maple Apartments",
+      "bio": "Senior moving out after graduation.",
+      "created_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "usr_taylor",
+      "name": "Taylor R.",
+      "email": "taylor.r@scu.edu",
+      "password_hash": "",
+      "residence": "West Hall",
+      "bio": "Sophomore who can help with deliveries on weekends.",
+      "created_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "usr_amara",
+      "name": "Amara L.",
+      "email": "amara.l@scu.edu",
+      "password_hash": "",
+      "residence": "Oak Residence",
+      "bio": "Junior selling furniture before study abroad.",
+      "created_at": "2026-10-18T12:00:00Z"
+    },
+    {
+      "id": "usr_jordan",
+      "name": "Jordan P.",
+      "email": "jordan.p@example.com",
+      "password_hash": "",
+      "residence": "Cedar Hall",
+      "bio": "Sample account without an SCU email.",
+      "created_at": "2026-10-18T12:00:00Z"
+    }
+  ],
   "listings": [
     {
       "id": "lst_1001",
-      "owner": "Hue N.",
+      "owner_id": "usr_hue",
       "name": "Compact mini fridge",
       "description": "Clean 3.1 cu ft fridge with a small freezer compartment. Fits easily under a lofted dorm bed.",
-      "photos": ["assets/mini-fridge.svg"],
+      "photos": [
+        "assets/mini-fridge.svg"
+      ],
       "price": 65,
       "category": "Appliances",
       "condition": "Good",
@@ -15,10 +55,12 @@
     },
     {
       "id": "lst_1002",
-      "owner": "You",
+      "owner_id": "usr_taylor",
       "name": "Solid wood study desk",
       "description": "Sturdy desk with a wide work surface. A few small marks from normal use; legs detach for moving.",
-      "photos": ["assets/desk.svg"],
+      "photos": [
+        "assets/desk.svg"
+      ],
       "price": 48,
       "category": "Furniture",
       "condition": "Good",
@@ -28,10 +70,12 @@
     },
     {
       "id": "lst_1003",
-      "owner": "Amara L.",
+      "owner_id": "usr_amara",
       "name": "Comfy reading chair",
       "description": "Cozy accent chair for a bedroom or reading corner. No stains or tears.",
-      "photos": ["assets/chair.svg"],
+      "photos": [
+        "assets/chair.svg"
+      ],
       "price": 35,
       "category": "Furniture",
       "condition": "Like new",
@@ -43,7 +87,7 @@
   "help_posts": [
     {
       "id": "hlp_2001",
-      "owner": "You",
+      "owner_id": "usr_taylor",
       "title": "Help carry a desk upstairs",
       "type": "Moving & lifting",
       "from_location": "West Hall lobby",
@@ -57,7 +101,7 @@
     },
     {
       "id": "hlp_2002",
-      "owner": "Jordan P.",
+      "owner_id": "usr_jordan",
       "title": "Mini fridge delivery across campus",
       "type": "Delivery",
       "from_location": "Maple Apartments",
@@ -69,6 +113,7 @@
       "status": "open",
       "created_at": "2026-10-19T18:10:00Z"
     }
-  ]
+  ],
+  "conversations": [],
+  "messages": []
 }
-
