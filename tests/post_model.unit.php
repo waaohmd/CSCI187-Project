@@ -9,6 +9,7 @@ require_once __DIR__ . '/php_test_helpers.php';
 use CampusMarketplace\Domain\OwnershipError;
 use CampusMarketplace\Domain\NotFoundError;
 use CampusMarketplace\Domain\ValidationError;
+use function CampusMarketplace\Model\closeHelpPost;
 use function CampusMarketplace\Model\createPost;
 use function CampusMarketplace\Model\isKnownResource;
 use function CampusMarketplace\Model\listPosts;
@@ -43,12 +44,13 @@ $users = [
 ];
 $ownedListing = [...$validListing, 'id' => 'lst_owned', 'owner_id' => $userId, 'status' => 'available'];
 $otherListing = [...$validListing, 'id' => 'lst_other', 'owner_id' => 'usr_other', 'status' => 'available'];
+$otherHelpPost = [...$validHelpPost, 'id' => 'hlp_other', 'owner_id' => 'usr_other', 'status' => 'open'];
 
 $dataFile = tempnam(sys_get_temp_dir(), 'post_model_test');
 check($dataFile !== false, 'A temporary data file should be created');
 
 try {
-    writeStore($dataFile, ['users' => $users, 'listings' => [$ownedListing, $otherListing], 'help_posts' => []]);
+    writeStore($dataFile, ['users' => $users, 'listings' => [$ownedListing, $otherListing], 'help_posts' => [$otherHelpPost]]);
 
     check(isKnownResource('listings'), 'Listings should be a known resource');
     check(isKnownResource('help'), 'Help should be a known resource');
@@ -72,7 +74,7 @@ try {
     $createdHelpPost = createPost($dataFile, 'help', $userId, $validHelpPost);
     checkSame('open', $createdHelpPost['status'], 'A new help post should be open');
     check(str_starts_with($createdHelpPost['id'], 'hlp_'), 'A help post ID should use the help prefix');
-    checkSame(1, count(listPosts($dataFile, 'help')), 'A new help post should be saved');
+    checkSame(2, count(listPosts($dataFile, 'help')), 'A new help post should be saved');
 
     expectException(
         fn () => createPost($dataFile, 'listings', $userId, [...$validListing, 'name' => '']),
@@ -90,10 +92,16 @@ try {
     $soldListing = sellListing($dataFile, $userId, 'lst_owned');
     checkSame('sold', $soldListing['status'], 'Selling should mark the listing as sold');
 
+    $closedHelpPost = closeHelpPost($dataFile, $userId, $createdHelpPost['id']);
+    checkSame('closed', $closedHelpPost['status'], 'Closing should mark the help post as closed');
+    $editedHelpPost = updatePost($dataFile, 'help', $userId, $createdHelpPost['id'], $validHelpPost);
+    checkSame('closed', $editedHelpPost['status'], 'Editing should keep a help post closed');
+
     $protectedActions = [
         fn () => updatePost($dataFile, 'listings', $userId, 'lst_other', $validListing),
         fn () => sellListing($dataFile, $userId, 'lst_other'),
         fn () => removePost($dataFile, 'listings', $userId, 'lst_other'),
+        fn () => closeHelpPost($dataFile, $userId, 'hlp_other'),
     ];
     foreach ($protectedActions as $protectedAction) {
         expectException($protectedAction, OwnershipError::class, 'Another student\'s post should be protected');
@@ -103,6 +111,7 @@ try {
         fn () => updatePost($dataFile, 'listings', $userId, 'lst_missing', $validListing),
         fn () => sellListing($dataFile, $userId, 'lst_missing'),
         fn () => removePost($dataFile, 'listings', $userId, 'lst_missing'),
+        fn () => closeHelpPost($dataFile, $userId, 'hlp_missing'),
     ];
     foreach ($missingPostActions as $missingPostAction) {
         expectException($missingPostAction, NotFoundError::class, 'A missing post should be reported');

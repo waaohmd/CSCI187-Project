@@ -40,6 +40,7 @@ $store = [
             'to_location' => 'East Hall',
             'status' => 'open',
         ],
+        ['id' => 'hlp_closed', 'owner_id' => $buyerId, 'title' => 'Done', 'status' => 'closed'],
     ],
 ];
 $listingResponse = ['post_type' => 'listing', 'post_id' => 'lst_open', 'body' => 'Is this available?'];
@@ -75,6 +76,7 @@ try {
     $rejectedResponses = [
         ['data' => $listingResponse, 'userId' => $sellerId, 'error' => ValidationError::class, 'label' => 'own post'],
         ['data' => [...$listingResponse, 'post_id' => 'lst_sold'], 'userId' => $buyerId, 'error' => ConflictError::class, 'label' => 'sold listing'],
+        ['data' => [...$listingResponse, 'post_type' => 'help', 'post_id' => 'hlp_closed'], 'userId' => $moverId, 'error' => ConflictError::class, 'label' => 'closed help post'],
         ['data' => [...$listingResponse, 'post_id' => 'lst_missing'], 'userId' => $buyerId, 'error' => NotFoundError::class, 'label' => 'missing post'],
         ['data' => [...$listingResponse, 'post_type' => 'car'], 'userId' => $buyerId, 'error' => ValidationError::class, 'label' => 'unknown post type'],
         ['data' => [...$listingResponse, 'body' => ' '], 'userId' => $moverId, 'error' => ValidationError::class, 'label' => 'empty message'],
@@ -91,6 +93,7 @@ try {
     $sellerReply = sendMessage($dataFile, $sellerId, $buyerConversation['id'], ['body' => 'Yes, it is.']);
     checkSame($buyerId, $sellerReply['other_user']['id'], 'A seller should talk to the buyer');
     checkSame($sellerId, $sellerReply['messages'][2]['sender_id'], 'A reply should record its sender');
+    check($sellerReply['messages'][2]['created_at'] !== '', 'A reply should record its time');
     checkSame(
         ['Is this available?', 'Still interested.', 'Yes, it is.'],
         array_column(getConversation($dataFile, $buyerId, $buyerConversation['id'])['messages'], 'body'),

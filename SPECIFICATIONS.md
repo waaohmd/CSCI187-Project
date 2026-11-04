@@ -10,7 +10,7 @@ These specifications describe how the MVP behaves. Each section maps to the matc
 - **Domain:** `src/Domain.php` contains plain validation, permission, and lookup functions.
 - **Storage:** `src/Store.php` reads and writes `data/store.json` with file locking.
 
-See `docs/CRC_DIAGRAM.md` for responsibilities and `docs/ER_DIAGRAM.md` for the data model.
+See `docs/CRC_DIAGRAM.md` for the CRC cards and `docs/ER_DIAGRAM.md` for the data model.
 
 ## Specifications for posting [1–5]
 
@@ -37,8 +37,9 @@ See `docs/CRC_DIAGRAM.md` for responsibilities and `docs/ER_DIAGRAM.md` for the 
 7. The **My posts** page displays the user's listings and help posts, plus counts of listings, sold listings, and help posts.
 8. When the user clicks **Edit** on their post, the system opens the form filled with the post's current values. When the user clicks **Save changes**, the system validates and saves the post using the same rules as creating it.
 9. When the user clicks **Mark sold** on an available listing, the system sets its status to `sold` and hides the **Mark sold** button.
-10. When the user clicks **Remove** on their post, the system asks "Remove this post? This action cannot be undone." When the user confirms, the system deletes the post from every list. When the user cancels, nothing changes.
-11. When a user tries to edit, sell, or remove a post they do not own, the API rejects the request with status `403`.
+10. When the user clicks **Mark closed** on an open help post, the system sets its status to `closed`, removes it from the Moving help page, keeps it in **My posts**, and hides the **Mark closed** button.
+11. When the user clicks **Remove** on their post, the system asks "Remove this post? This action cannot be undone." When the user confirms, the system deletes the post from every list. When the user cancels, nothing changes.
+12. When a user tries to edit, sell, close, or remove a post they do not own, the API rejects the request with status `403`.
 
 ## Specifications for responding and buying [6–10]
 
@@ -51,15 +52,15 @@ See `docs/CRC_DIAGRAM.md` for responsibilities and `docs/ER_DIAGRAM.md` for the 
 7. The system keeps sold listings visible with a **Sold** badge.
 8. When the user clicks **View details**, the system shows the listing's photos, description, price, category, condition, pickup location, and the seller's name, verification, residence, and bio.
 9. When a buyer clicks **Message seller**, the system asks for a message and an optional drop-off location, then starts a conversation with the seller.
-10. The Moving help page displays every help post's title, type, route, details, date and time, poster, poster verification, and cash offer.
+10. The Moving help page displays every open help post's title, type, route, details, date and time, poster, poster verification, and cash offer.
 11. When a mover clicks **Respond** on a help post, the system asks for a message, then starts a conversation with the poster.
-12. The system hides the response buttons on the user's own posts and on sold listings. The API rejects a response to the user's own post with status `422` and a response to a sold listing with status `409`.
+12. The system hides the response buttons on the user's own posts and on sold listings. The API rejects a response to the user's own post with status `422` and a response to a sold listing or closed help post with status `409`.
 13. When a user responds to the same post again, the system adds the message to their existing conversation.
 
 ## Specifications for contact and coordination [11–12]
 
 1. The **Messages** page lists the user's conversations, most recently active first, with the post title, the other user, and the latest message.
-2. When the user opens a conversation, the system displays its messages in the order they were sent and the other user's verification.
+2. When the user opens a conversation, the system displays each message's sender, text, and time in the order they were sent, plus the other user's verification.
 3. When the user clicks **Send**, the system adds a message of 1–1,000 characters to the conversation.
 4. The open page checks for new messages every five seconds.
 5. Each conversation stores a pickup and a drop-off location of up to 120 characters. A listing response starts with the listing's pickup location and the buyer's drop-off location. A help response starts with the help post's locations.
@@ -93,6 +94,7 @@ All requests go to `api.php`. Set `resource` to `auth`, `profile`, `listings`, `
 | `GET` | `resource=listings` or `help` | none | No | `200` with every post and its `owner` |
 | `POST` | `resource=listings` or `help` | post fields | Yes | `201` with the new post |
 | `POST` | `resource=listings&id=…&action=sell` | none | Yes | `200` with the listing marked `sold` |
+| `POST` | `resource=help&id=…&action=close` | none | Yes | `200` with the help post marked `closed` |
 | `PUT` | `resource=listings` or `help`, `id` | post fields | Yes | `200` with the updated post |
 | `DELETE` | `resource=listings` or `help`, `id` | none | Yes | `200` with the deleted post |
 | `GET` | `resource=conversations` | none | Yes | `200` with the user's conversations |
@@ -110,7 +112,7 @@ Set `post_type` to `listing` or `help`. Successful responses use the shape `{ "d
 | `403` | The post or conversation belongs to other users. |
 | `404` | The resource, action, or record does not exist. |
 | `405` | The method is not supported. |
-| `409` | The email already has an account, or the listing is already sold. |
+| `409` | The email already has an account, or the post is sold or closed. |
 | `422` | A field failed validation. |
 | `500` | The data store could not be read or written. |
 
@@ -122,7 +124,7 @@ Set `post_type` to `listing` or `help`. Successful responses use the shape `{ "d
 | --- | --- | --- |
 | User | `usr_` + random hex | none |
 | Listing | `lst_` + random hex | `available` or `sold` |
-| Help post | `hlp_` + random hex | `open` |
+| Help post | `hlp_` + random hex | `open` or `closed` |
 | Conversation | `cnv_` + random hex | none |
 | Message | `msg_` + random hex | none |
 

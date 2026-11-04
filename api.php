@@ -11,6 +11,7 @@ use CampusMarketplace\Domain\NotFoundError;
 use CampusMarketplace\Domain\OwnershipError;
 use CampusMarketplace\Domain\ValidationError;
 use function CampusMarketplace\Model\authenticateUser;
+use function CampusMarketplace\Model\closeHelpPost;
 use function CampusMarketplace\Model\createPost;
 use function CampusMarketplace\Model\findAccount;
 use function CampusMarketplace\Model\getConversation;
@@ -138,6 +139,9 @@ function routePosts(string $method, string $resource, string $postId, string $ac
     $userId = signedInUserId();
     if ($method === 'POST' && $postId !== '' && $resource === 'listings' && $action === 'sell') {
         respond(200, ['data' => sellListing(DATA_FILE, $userId, $postId)]);
+    }
+    if ($method === 'POST' && $postId !== '' && $resource === 'help' && $action === 'close') {
+        respond(200, ['data' => closeHelpPost(DATA_FILE, $userId, $postId)]);
     }
     if ($method === 'POST') {
         respond(201, ['data' => createPost(DATA_FILE, $resource, $userId, requestBody())]);

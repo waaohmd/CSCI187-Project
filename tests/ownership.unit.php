@@ -45,6 +45,12 @@ expectException(
     'A sold listing should not accept responses'
 );
 
+expectException(
+    fn () => assertCanRespond([...$otherPost, 'status' => 'closed'], $userId),
+    ConflictError::class,
+    'A closed help post should not accept responses'
+);
+
 $conversation = ['owner_id' => 'usr_owner', 'responder_id' => 'usr_responder'];
 assertConversationParticipant($conversation, 'usr_owner');
 assertConversationParticipant($conversation, 'usr_responder');

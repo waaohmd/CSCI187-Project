@@ -1,4 +1,4 @@
-import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, postsOwnedBy, saveConversationInList, savePostInCollection } from './marketplace.js';
+import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, messageSenderName, openHelpPosts, postsOwnedBy, saveConversationInList, savePostInCollection } from './marketplace.js';
 
 (() => {
   'use strict';
@@ -41,6 +41,8 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
     const parsed = new Date(`${date}T${time || '12:00'}`);
     return Number.isNaN(parsed.getTime()) ? `${date} ${time}` : parsed.toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
   };
+
+  const messageTime = value => new Date(value).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
 
   async function request(resource, { method = 'GET', id = '', action = '', data } = {}) {
     const query = new URLSearchParams({ resource });
@@ -100,10 +102,10 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
     </article>`;
   }
 
-  function actionButtons(resource, id, canSell) {
+  function actionButtons(resource, id, statusAction = null) {
     return `<div class="post-actions">
       <button class="small-button" data-action="edit" data-resource="${resource}" data-id="${escapeHtml(id)}">Edit</button>
-      ${canSell ? `<button class="small-button" data-action="sold" data-resource="listings" data-id="${escapeHtml(id)}">Mark sold</button>` : ''}
+      ${statusAction ? `<button class="small-button" data-action="${statusAction.action}" data-resource="${resource}" data-id="${escapeHtml(id)}">${statusAction.label}</button>` : ''}
       <button class="small-button danger-link" data-action="delete" data-resource="${resource}" data-id="${escapeHtml(id)}">Remove</button>
     </div>`;
   }
@@ -111,13 +113,14 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
   function myListingRow(item) {
     return `<article class="post-row"><div class="card-line"><h3>${escapeHtml(item.name)}</h3><strong>${money(item.price)}</strong></div>
       <div><span class="badge">${escapeHtml(item.condition)}</span><span class="badge ${item.status === 'sold' ? 'sold' : ''}">${escapeHtml(item.status)}</span></div>
-      ${actionButtons('listings', item.id, item.status !== 'sold')}</article>`;
+      ${actionButtons('listings', item.id, item.status === 'sold' ? null : { action: 'sold', label: 'Mark sold' })}</article>`;
   }
 
   function myHelpRow(item) {
     return `<article class="post-row"><div class="card-line"><h3>${escapeHtml(item.title)}</h3><strong>${money(item.offer)}</strong></div>
+      <div><span class="badge ${item.status === 'closed' ? 'sold' : ''}">${escapeHtml(item.status)}</span></div>
       <p class="meta">${dateTime(item.date, item.time)} · ${escapeHtml(item.from_location)} → ${escapeHtml(item.to_location)}</p>
-      ${actionButtons('help', item.id, false)}</article>`;
+      ${actionButtons('help', item.id, item.status === 'closed' ? null : { action: 'close', label: 'Mark closed' })}</article>`;
   }
 
   function renderMarketplace() {
@@ -131,8 +134,9 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
   }
 
   function renderHelp() {
-    elements.helpList.innerHTML = state.help_posts.map(helpCard).join('');
-    toggleEmpty(state.help_posts.length === 0);
+    const helpPosts = openHelpPosts(state.help_posts);
+    elements.helpList.innerHTML = helpPosts.map(helpCard).join('');
+    toggleEmpty(helpPosts.length === 0);
   }
 
   function renderMine() {
@@ -154,9 +158,10 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
     </button>`;
   }
 
-  function messageBubble(message) {
+  function messageBubble(message, conversation) {
     const mine = message.sender_id === state.user.id ? ' mine' : '';
-    return `<div class="message${mine}"><p>${escapeHtml(message.body)}</p></div>`;
+    const sender = messageSenderName(message, conversation, state.user.id);
+    return `<div class="message${mine}"><p class="meta">${escapeHtml(sender)} · ${messageTime(message.created_at)}</p><p>${escapeHtml(message.body)}</p></div>`;
   }
 
   function renderActiveConversation() {
@@ -164,7 +169,7 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
     elements.conversationPanel.hidden = !conversation;
     if (!conversation) return;
     elements.conversationHeading.innerHTML = `<h2>${escapeHtml(conversation.post_title)}</h2><p class="meta">With ${escapeHtml(conversation.other_user?.name)}</p>${verifiedBadge(conversation.other_user)}`;
-    elements.messageList.innerHTML = conversation.messages.map(messageBubble).join('');
+    elements.messageList.innerHTML = conversation.messages.map(message => messageBubble(message, conversation)).join('');
     elements.messageList.scrollTop = elements.messageList.scrollHeight;
     if (elements.locationsForm.contains(document.activeElement)) return;
     elements.locationsForm.elements.pickup_location.value = conversation.pickup_location;
@@ -407,6 +412,7 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
     if (action === 'edit') openForm(resource === 'listings' ? 'listing' : 'help', item);
     if (action === 'delete') { state.pendingDelete = { resource, key, id }; elements.confirmOverlay.hidden = false; }
     if (action === 'sold') markSold(id);
+    if (action === 'close') closeHelpRequest(id);
     if (action === 'details') openListingDetails(item);
     if (action === 'respond') openResponse(resource, item);
   }
@@ -416,6 +422,14 @@ import { canRespondToPost, fillPostForm, filterListings, lastMessagePreview, pos
       const saved = await request('listings', { method: 'POST', id, action: 'sell' });
       updateStateRecord('listings', saved, id);
       renderAll(); showToast('Listing marked as sold.');
+    } catch (error) { showToast(error.message, true); }
+  }
+
+  async function closeHelpRequest(id) {
+    try {
+      const saved = await request('help', { method: 'POST', id, action: 'close' });
+      updateStateRecord('help_posts', saved, id);
+      renderAll(); showToast('Help post closed.');
     } catch (error) { showToast(error.message, true); }
   }
 

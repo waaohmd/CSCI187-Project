@@ -8,7 +8,7 @@ A web app for SCU students to buy and sell used items, request moving and delive
 - Create, edit, sell, and remove item listings.
 - Search listings by name, description, location, or category, and filter by category and condition.
 - View full listing details, including seller information and verification.
-- Create, edit, and remove moving or delivery requests.
+- Create, edit, close, and remove moving or delivery requests.
 - Respond to listings and help posts, chat with other students, and agree on pickup and drop-off locations.
 
 ## Prerequisites
@@ -50,7 +50,7 @@ Run the last command in a second terminal. Without `MARKETPLACE_DATA_FILE`, the 
 
 - `REQUIREMENTS.md` lists what the app must do.
 - `SPECIFICATIONS.md` describes how the app behaves and documents the API.
-- `docs/CRC_DIAGRAM.md` shows each component's responsibilities.
+- `docs/CRC_DIAGRAM.md` lists the CRC cards. Edit the diagram in `docs/CRC_DIAGRAM.drawio`.
 - `docs/ER_DIAGRAM.md` shows the data model.
 
 Read `PROJECT_BRIEF.md` and `STYLE_REQUIREMENTS.md` before changing the project.

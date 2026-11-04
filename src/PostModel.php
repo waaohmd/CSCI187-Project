@@ -100,6 +100,17 @@ function sellListing(string $dataFile, string $userId, string $listingId): array
     return postWithOwner($store['listings'][$listingIndex], $store['users']);
 }
 
+function closeHelpPost(string $dataFile, string $userId, string $helpPostId): array
+{
+    $store = readStore($dataFile);
+    $helpPostIndex = ownedPostIndex($store['help_posts'], $helpPostId, $userId, 'Help post not found.');
+    $store['help_posts'][$helpPostIndex]['status'] = 'closed';
+    $store['help_posts'][$helpPostIndex]['updated_at'] = gmdate('c');
+    writeStore($dataFile, $store);
+
+    return postWithOwner($store['help_posts'][$helpPostIndex], $store['users']);
+}
+
 function removePost(string $dataFile, string $resource, string $userId, string $postId): array
 {
     $store = readStore($dataFile);

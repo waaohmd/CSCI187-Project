@@ -49,7 +49,7 @@ erDiagram
         string time
         float offer
         string details
-        string status "open"
+        string status "open or closed"
         string created_at
         string updated_at
     }

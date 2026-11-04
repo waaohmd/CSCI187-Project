@@ -212,6 +212,9 @@ function assertCanRespond(array $post, string $userId): void
     if (($post['status'] ?? '') === 'sold') {
         throw new ConflictError('This listing has already been sold.');
     }
+    if (($post['status'] ?? '') === 'closed') {
+        throw new ConflictError('This help post is closed.');
+    }
 }
 
 function assertConversationParticipant(array $conversation, string $userId): void

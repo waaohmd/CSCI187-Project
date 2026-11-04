@@ -1,7 +1,7 @@
 // Author: Abhinav Raghavendra
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { canRespondToPost, lastMessagePreview, postsOwnedBy, saveConversationInList } from '../assets/marketplace.js';
+import { canRespondToPost, lastMessagePreview, messageSenderName, openHelpPosts, postsOwnedBy, saveConversationInList } from '../assets/marketplace.js';
 
 const user = { id: 'usr_current' };
 
@@ -15,6 +15,28 @@ test('a user cannot respond to their own post', () => {
 
 test('nobody can respond to a sold listing', () => {
   assert.equal(canRespondToPost({ owner_id: 'usr_other', status: 'sold' }, user), false);
+});
+
+test('nobody can respond to a closed help post', () => {
+  assert.equal(canRespondToPost({ owner_id: 'usr_other', status: 'closed' }, user), false);
+});
+
+test('the Moving help page leaves out closed help posts', () => {
+  const posts = [{ id: 'hlp_open', status: 'open' }, { id: 'hlp_closed', status: 'closed' }];
+
+  assert.deepEqual(openHelpPosts(posts).map(post => post.id), ['hlp_open']);
+  assert.deepEqual(openHelpPosts([]), []);
+});
+
+test('a message shows You for the signed-in user and a name for the other user', () => {
+  const conversation = { other_user: { name: 'Hue N.' } };
+
+  assert.equal(messageSenderName({ sender_id: 'usr_current' }, conversation, 'usr_current'), 'You');
+  assert.equal(messageSenderName({ sender_id: 'usr_other' }, conversation, 'usr_current'), 'Hue N.');
+});
+
+test('a message still has a sender label when the other user no longer exists', () => {
+  assert.equal(messageSenderName({ sender_id: 'usr_gone' }, { other_user: null }, 'usr_current'), 'Unknown student');
 });
 
 test('a signed-out visitor sees the respond action so it can prompt sign-in', () => {

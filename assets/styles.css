@@ -57,6 +57,7 @@ input:focus, select:focus, textarea:focus { outline:3px solid #dce6ff; border-co
 .message { max-width:80%; padding:8px 12px; border-radius:8px; background:#eef2f7; align-self:flex-start; overflow-wrap:anywhere; }
 .message.mine { background:#dce6ff; align-self:flex-end; }
 .message p { margin:0; color:var(--text); white-space:pre-wrap; }
+.message .meta { margin-bottom:2px; color:var(--muted); font-size:12px; }
 .message-form { display:grid; grid-template-columns:1fr auto; gap:10px; align-items:end; }
 .profile-form { max-width:560px; padding:20px; background:#fff; border:1px solid var(--border); border-radius:8px; }
 .help-list, .post-list { display:grid; gap:12px; }

@@ -1,91 +1,76 @@
 # CRC Diagram — Campus Community Marketplace
 
-Each card lists one component's responsibilities and collaborators. The PHP code uses plain functions, so each card describes a file rather than a class.
-
-## Collaboration overview
+These cards match `docs/CRC_DIAGRAM.drawio`. Open that file in [diagrams.net](https://app.diagrams.net) to view or edit the diagram, and update this page in the same change.
 
 ```mermaid
 flowchart TD
-    Page["Page: index.php, app.js"] --> Rules["Browser rules: marketplace.js"]
-    Page -->|HTTP and JSON| Controller["Controller: api.php"]
-    Controller --> PostModel["PostModel"]
-    Controller --> UserModel["UserModel"]
-    Controller --> ConversationModel["ConversationModel"]
-    PostModel --> Domain["Domain"]
-    UserModel --> Domain
-    ConversationModel --> Domain
-    PostModel --> Store["Store"]
-    UserModel --> Store
-    ConversationModel --> Store
-    Store --> Data[("data/store.json")]
+    MainPage["Main Page"] ---|lists| Post
+    Post -->|owned by| User
+    Item -->|part of| Post
+    Post ---|about| Chat
+    Message -->|part of| Chat
+    User ---|sender| Message
+    User ---|participant| Chat
 ```
 
-## Page (`index.php`, `assets/app.js`)
+## Main Page
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| Render the Marketplace, Moving help, My posts, Messages, and Profile views | Browser rules |
-| Collect form input and show errors | Controller |
-| Open sign-in when a signed-out user needs an account | Controller |
-| Check for new messages while **Messages** is open | Controller |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| Listings and open help posts | Add a new post to the page | Post |
+| For Sale / Moving Help tabs | Hide closed help posts | |
+| | Badge sold listings | |
+| | Show posts by section | |
 
-## Browser rules (`assets/marketplace.js`)
+## User
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| Search and filter listings | Page |
-| Update post and conversation lists | Page |
-| Decide who can respond to a post | Page |
-| Reset post forms so a new post never reuses an edited post's ID | Page |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| User ID, name | Sign in and out | Post |
+| SCU email | Create, edit, delete posts | Chat |
+| Verified SCU status | Start a chat about a post | Message |
+| Residence, bio | Update profile | |
+| Posts they created | | |
+| Chats they belong to | | |
 
-## Controller (`api.php`)
+## Post
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| Start, remember, and end sessions | UserModel |
-| Require sign-in for protected requests | PostModel |
-| Route requests to the correct model | ConversationModel |
-| Translate errors into HTTP status codes and JSON | Domain |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| Post ID | Show item and owner details | User |
+| Owner (User) | Update its status | Item |
+| Item (For Sale posts) | Open a chat with the owner | Chat |
+| Type: For Sale / Moving Help | | Main Page |
+| Pickup location | | |
+| Drop-off (Moving Help posts) | | |
+| Status: available / sold or open / closed | | |
 
-## PostModel (`src/PostModel.php`)
+## Item
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| List listings and help posts with their owners | Domain |
-| Create, update, and remove posts | Store |
-| Mark listings as sold | |
-| Allow changes only by the post owner | |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| Stored on its For Sale post | Update its details | Post |
+| Description | Give a summary for display | |
+| Photos | | |
+| Price | | |
+| Category, condition | | |
 
-## UserModel (`src/UserModel.php`)
+## Message
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| Register accounts with unique SCU emails | Domain |
-| Hash and check passwords | Store |
-| Read and update profiles | |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| Message ID | Show sender, text and time | User |
+| Sender (User) | Add itself to its chat | Chat |
+| Text | | |
+| Timestamp | | |
+| Chat ID | | |
 
-## ConversationModel (`src/ConversationModel.php`)
+## Chat
 
-| Responsibilities | Collaborators |
-| --- | --- |
-| Start or reuse a conversation when a user responds to a post | Domain |
-| Add messages and list a user's conversations | Store |
-| Set default locations and save pickup and drop-off changes | |
-| Allow access only to conversation participants | |
-
-## Domain (`src/Domain.php`)
-
-| Responsibilities | Collaborators |
-| --- | --- |
-| Validate listings, help posts, accounts, profiles, messages, and locations | PostModel |
-| Decide SCU verification and build public profiles | UserModel |
-| Enforce post ownership, response, and participant rules | ConversationModel |
-| Define the errors that the Controller translates | Controller |
-
-## Store (`src/Store.php`)
-
-| Responsibilities | Collaborators |
-| --- | --- |
-| Read and write `data/store.json` with file locks | PostModel |
-| Provide empty collections when data is missing | UserModel |
-| Report storage failures | ConversationModel |
+| Knows | Does | Collaborators |
+| --- | --- | --- |
+| Chat ID | Send a message | User |
+| Participants (2 users) | Show message history | Post |
+| Post it is about | Save locations | Message |
+| List of messages | | |
+| Pickup / drop-off locations | | |

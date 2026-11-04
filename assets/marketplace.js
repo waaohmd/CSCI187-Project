@@ -17,7 +17,15 @@ export function postsOwnedBy(posts, userId) {
 }
 
 export function canRespondToPost(post, user) {
-  return post.owner_id !== user?.id && post.status !== 'sold';
+  return post.owner_id !== user?.id && !['sold', 'closed'].includes(post.status);
+}
+
+export function openHelpPosts(helpPosts) {
+  return helpPosts.filter(post => post.status !== 'closed');
+}
+
+export function messageSenderName(message, conversation, userId) {
+  return message.sender_id === userId ? 'You' : conversation.other_user?.name ?? 'Unknown student';
 }
 
 export function saveConversationInList(conversations, savedConversation) {

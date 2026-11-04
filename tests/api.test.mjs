@@ -130,6 +130,10 @@ assert.equal((await expectData(buyer, 'conversations')).some(item => item.id ===
 
 const moverConversation = await expectData(seller, 'conversations', { method: 'POST', body: { post_type: 'help', post_id: help.id, body: 'I can help.' } }, 201);
 assert.equal(moverConversation.dropoff_location, 'Test Hall C');
+await expectError(seller, 'help', { method: 'POST', id: help.id, action: 'close' }, 403);
+const closedHelp = await expectData(buyer, 'help', { method: 'POST', id: help.id, action: 'close' });
+assert.equal(closedHelp.status, 'closed');
+await expectError(outsider, 'conversations', { method: 'POST', body: { post_type: 'help', post_id: help.id, body: 'Hello' } }, 409);
 
 const soldListing = await expectData(seller, 'listings', { method: 'POST', id: listing.id, action: 'sell' });
 assert.equal(soldListing.status, 'sold');
