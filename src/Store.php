@@ -5,6 +5,8 @@ namespace CampusMarketplace\Persistence;
 
 use RuntimeException;
 
+const EMPTY_STORE = ['users' => [], 'listings' => [], 'help_posts' => [], 'conversations' => [], 'messages' => []];
+
 function readStore(string $dataFile): array
 {
     $handle = fopen($dataFile, 'c+');
@@ -28,7 +30,7 @@ function readStore(string $dataFile): array
         throw new RuntimeException('The data store is invalid.');
     }
 
-    return array_merge(['listings' => [], 'help_posts' => []], $decoded);
+    return array_merge(EMPTY_STORE, $decoded);
 }
 
 function writeStore(string $dataFile, array $store): void

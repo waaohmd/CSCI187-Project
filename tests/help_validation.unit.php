@@ -51,9 +51,7 @@ foreach ($invalidHelpPosts as $case) {
     checkSame($case['field'], $error->field, 'Validation should identify the invalid help field');
 }
 
-$existingHelpPost = [...$helpPost, 'owner' => 'Another student'];
-$updatedHelpPost = validateHelpPost([...$validHelpPost, 'title' => 'Updated request'], $existingHelpPost);
-checkSame('Another student', $updatedHelpPost['owner'], 'Editing should preserve help-post ownership');
+$updatedHelpPost = validateHelpPost([...$validHelpPost, 'title' => 'Updated request'], $helpPost);
 checkSame('open', $updatedHelpPost['status'], 'Editing should preserve help-post status');
 
 echo "Help validation unit tests passed.\n";

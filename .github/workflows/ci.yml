@@ -48,7 +48,8 @@ jobs:
       - name: Run API integration tests
         shell: bash
         run: |
-          php -S 127.0.0.1:8080 -t . > "$RUNNER_TEMP/php-server.log" 2>&1 &
+          cp data/store.json "$RUNNER_TEMP/store.json"
+          MARKETPLACE_DATA_FILE="$RUNNER_TEMP/store.json" php -S 127.0.0.1:8080 -t . > "$RUNNER_TEMP/php-server.log" 2>&1 &
           server_pid=$!
           trap 'kill "$server_pid" 2>/dev/null || true' EXIT
 

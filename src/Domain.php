@@ -5,8 +5,10 @@ namespace CampusMarketplace\Domain;
 
 use RuntimeException;
 
-const CURRENT_OWNER = 'You';
 const MAX_PHOTOS = 4;
+const SCU_EMAIL_SUFFIX = '@scu.edu';
+const MIN_PASSWORD_LENGTH = 8;
+const MAX_PASSWORD_LENGTH = 72;
 const LISTING_CATEGORIES = ['Furniture', 'Appliances', 'Electronics', 'Clothing', 'School supplies', 'Other'];
 const LISTING_CONDITIONS = ['Like new', 'Good', 'Fair', 'Well loved'];
 const HELP_TYPES = ['Delivery', 'Moving & lifting', 'Hauling', 'Driving'];
@@ -23,7 +25,15 @@ final class OwnershipError extends RuntimeException
 {
 }
 
-final class PostNotFoundError extends RuntimeException
+final class NotFoundError extends RuntimeException
+{
+}
+
+final class AuthenticationError extends RuntimeException
+{
+}
+
+final class ConflictError extends RuntimeException
 {
 }
 
@@ -40,6 +50,11 @@ function requiredText(array $data, string $key, int $maximumLength, string $labe
     }
 
     return $value;
+}
+
+function optionalText(array $data, string $key, int $maximumLength, string $label): string
+{
+    return trim((string) ($data[$key] ?? '')) === '' ? '' : requiredText($data, $key, $maximumLength, $label);
 }
 
 function moneyValue(array $data, string $key, float $minimum, float $maximum, string $label): float
@@ -88,7 +103,6 @@ function validateListing(array $data, ?array $existingListing = null): array
         : ($existingListing['photos'] ?? []);
 
     return [
-        'owner' => $existingListing['owner'] ?? CURRENT_OWNER,
         'name' => requiredText($data, 'name', 80, 'Item name'),
         'description' => requiredText($data, 'description', 800, 'Description'),
         'photos' => $photos,
@@ -112,7 +126,6 @@ function validateHelpPost(array $data, ?array $existingHelpPost = null): array
     }
 
     return [
-        'owner' => $existingHelpPost['owner'] ?? CURRENT_OWNER,
         'title' => requiredText($data, 'title', 100, 'Title'),
         'type' => allowedValue($data, 'type', HELP_TYPES, 'Help type'),
         'from_location' => requiredText($data, 'from_location', 120, 'From location'),
@@ -125,10 +138,86 @@ function validateHelpPost(array $data, ?array $existingHelpPost = null): array
     ];
 }
 
-function assertPostOwned(array $post, string $currentOwner): void
+function isScuEmail(string $email): bool
 {
-    if (($post['owner'] ?? '') !== $currentOwner) {
+    return filter_var($email, FILTER_VALIDATE_EMAIL) !== false
+        && str_ends_with(strtolower($email), SCU_EMAIL_SUFFIX);
+}
+
+function normalizedEmail(array $data): string
+{
+    return strtolower(trim((string) ($data['email'] ?? '')));
+}
+
+function validateProfile(array $data): array
+{
+    return [
+        'name' => requiredText($data, 'name', 80, 'Name'),
+        'residence' => optionalText($data, 'residence', 100, 'Residence'),
+        'bio' => optionalText($data, 'bio', 300, 'Bio'),
+    ];
+}
+
+function validateRegistration(array $data): array
+{
+    $email = normalizedEmail($data);
+    if (!isScuEmail($email)) {
+        throw new ValidationError('email', 'Use your @scu.edu email address.');
+    }
+
+    $password = (string) ($data['password'] ?? '');
+    if (strlen($password) < MIN_PASSWORD_LENGTH || strlen($password) > MAX_PASSWORD_LENGTH) {
+        throw new ValidationError('password', 'Password must be 8 to 72 characters.');
+    }
+
+    return [...validateProfile($data), 'email' => $email, 'password' => $password];
+}
+
+function validateMessageBody(array $data): string
+{
+    return requiredText($data, 'body', 1000, 'Message');
+}
+
+function validateMeetingLocations(array $data): array
+{
+    return [
+        'pickup_location' => optionalText($data, 'pickup_location', 120, 'Pickup location'),
+        'dropoff_location' => optionalText($data, 'dropoff_location', 120, 'Drop-off location'),
+    ];
+}
+
+function publicUser(array $user): array
+{
+    return [
+        'id' => $user['id'],
+        'name' => $user['name'],
+        'residence' => $user['residence'] ?? '',
+        'bio' => $user['bio'] ?? '',
+        'verified' => isScuEmail($user['email'] ?? ''),
+    ];
+}
+
+function assertPostOwned(array $post, string $userId): void
+{
+    if (($post['owner_id'] ?? '') !== $userId) {
         throw new OwnershipError('You can only change your own posts.');
+    }
+}
+
+function assertCanRespond(array $post, string $userId): void
+{
+    if (($post['owner_id'] ?? '') === $userId) {
+        throw new ValidationError('post_id', 'You cannot respond to your own post.');
+    }
+    if (($post['status'] ?? '') === 'sold') {
+        throw new ConflictError('This listing has already been sold.');
+    }
+}
+
+function assertConversationParticipant(array $conversation, string $userId): void
+{
+    if (!in_array($userId, [$conversation['owner_id'], $conversation['responder_id']], true)) {
+        throw new OwnershipError('You are not part of this conversation.');
     }
 }
 
@@ -141,4 +230,11 @@ function findPostIndex(array $posts, string $postId): int
     }
 
     return -1;
+}
+
+function findRecord(array $records, string $recordId): ?array
+{
+    $recordIndex = findPostIndex($records, $recordId);
+
+    return $recordIndex < 0 ? null : $records[$recordIndex];
 }

@@ -6,14 +6,15 @@ namespace CampusMarketplace\Model;
 require_once __DIR__ . '/Domain.php';
 require_once __DIR__ . '/Store.php';
 
-use CampusMarketplace\Domain\PostNotFoundError;
+use CampusMarketplace\Domain\NotFoundError;
 use function CampusMarketplace\Domain\assertPostOwned;
 use function CampusMarketplace\Domain\findPostIndex;
+use function CampusMarketplace\Domain\findRecord;
+use function CampusMarketplace\Domain\publicUser;
 use function CampusMarketplace\Domain\validateHelpPost;
 use function CampusMarketplace\Domain\validateListing;
 use function CampusMarketplace\Persistence\readStore;
 use function CampusMarketplace\Persistence\writeStore;
-use const CampusMarketplace\Domain\CURRENT_OWNER;
 
 const RESOURCE_COLLECTIONS = ['listings' => 'listings', 'help' => 'help_posts'];
 const RESOURCE_ID_PREFIXES = ['listings' => 'lst_', 'help' => 'hlp_'];
@@ -30,41 +31,53 @@ function validatedPost(string $resource, array $data, ?array $existingPost = nul
         : validateHelpPost($data, $existingPost);
 }
 
-function ownedPostIndex(array $posts, string $postId, string $notFoundMessage): int
+function ownedPostIndex(array $posts, string $postId, string $userId, string $notFoundMessage): int
 {
     $postIndex = findPostIndex($posts, $postId);
     if ($postIndex < 0) {
-        throw new PostNotFoundError($notFoundMessage);
+        throw new NotFoundError($notFoundMessage);
     }
-    assertPostOwned($posts[$postIndex], CURRENT_OWNER);
+    assertPostOwned($posts[$postIndex], $userId);
 
     return $postIndex;
 }
 
-function listPosts(string $dataFile, string $resource): array
+function postWithOwner(array $post, array $users): array
 {
-    return readStore($dataFile)[RESOURCE_COLLECTIONS[$resource]];
+    $owner = findRecord($users, $post['owner_id'] ?? '');
+
+    return [...$post, 'owner' => $owner === null ? null : publicUser($owner)];
 }
 
-function createPost(string $dataFile, string $resource, array $data): array
+function listPosts(string $dataFile, string $resource): array
+{
+    $store = readStore($dataFile);
+
+    return array_map(
+        fn (array $post) => postWithOwner($post, $store['users']),
+        $store[RESOURCE_COLLECTIONS[$resource]]
+    );
+}
+
+function createPost(string $dataFile, string $resource, string $userId, array $data): array
 {
     $store = readStore($dataFile);
     $post = array_merge(
-        ['id' => RESOURCE_ID_PREFIXES[$resource] . bin2hex(random_bytes(5))],
+        ['id' => RESOURCE_ID_PREFIXES[$resource] . bin2hex(random_bytes(5)), 'owner_id' => $userId],
         validatedPost($resource, $data),
         ['created_at' => gmdate('c')]
     );
     array_unshift($store[RESOURCE_COLLECTIONS[$resource]], $post);
     writeStore($dataFile, $store);
 
-    return $post;
+    return postWithOwner($post, $store['users']);
 }
 
-function updatePost(string $dataFile, string $resource, string $postId, array $data): array
+function updatePost(string $dataFile, string $resource, string $userId, string $postId, array $data): array
 {
     $store = readStore($dataFile);
     $collection = RESOURCE_COLLECTIONS[$resource];
-    $postIndex = ownedPostIndex($store[$collection], $postId, 'Post not found.');
+    $postIndex = ownedPostIndex($store[$collection], $postId, $userId, 'Post not found.');
     $existingPost = $store[$collection][$postIndex];
     $store[$collection][$postIndex] = array_merge(
         $existingPost,
@@ -73,25 +86,25 @@ function updatePost(string $dataFile, string $resource, string $postId, array $d
     );
     writeStore($dataFile, $store);
 
-    return $store[$collection][$postIndex];
+    return postWithOwner($store[$collection][$postIndex], $store['users']);
 }
 
-function sellListing(string $dataFile, string $listingId): array
+function sellListing(string $dataFile, string $userId, string $listingId): array
 {
     $store = readStore($dataFile);
-    $listingIndex = ownedPostIndex($store['listings'], $listingId, 'Listing not found.');
+    $listingIndex = ownedPostIndex($store['listings'], $listingId, $userId, 'Listing not found.');
     $store['listings'][$listingIndex]['status'] = 'sold';
     $store['listings'][$listingIndex]['updated_at'] = gmdate('c');
     writeStore($dataFile, $store);
 
-    return $store['listings'][$listingIndex];
+    return postWithOwner($store['listings'][$listingIndex], $store['users']);
 }
 
-function removePost(string $dataFile, string $resource, string $postId): array
+function removePost(string $dataFile, string $resource, string $userId, string $postId): array
 {
     $store = readStore($dataFile);
     $collection = RESOURCE_COLLECTIONS[$resource];
-    $postIndex = ownedPostIndex($store[$collection], $postId, 'Post not found.');
+    $postIndex = ownedPostIndex($store[$collection], $postId, $userId, 'Post not found.');
     [$removedPost] = array_splice($store[$collection], $postIndex, 1);
     writeStore($dataFile, $store);
 

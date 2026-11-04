@@ -48,9 +48,8 @@ foreach ($invalidListings as $case) {
     checkSame($case['field'], $error->field, 'Validation should identify the invalid listing field');
 }
 
-$existingListing = [...$listing, 'owner' => 'Another student', 'status' => 'sold'];
+$existingListing = [...$listing, 'status' => 'sold'];
 $updatedListing = validateListing([...$validListing, 'name' => 'Updated lamp'], $existingListing);
-checkSame('Another student', $updatedListing['owner'], 'Editing should preserve listing ownership');
 checkSame('sold', $updatedListing['status'], 'Editing should preserve listing status');
 
 echo "Listing validation unit tests passed.\n";
